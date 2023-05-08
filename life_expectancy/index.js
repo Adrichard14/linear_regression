@@ -3,23 +3,57 @@ async function main() {
   await pyodide.loadPackage('numpy');
   await pyodide.loadPackage('matplotlib');
   await pyodide.loadPackage('scikit-learn');
+    await pyodide.loadPackage('pandas');
   await pyodide.runPython(`
+
+    import pandas as pd
     import numpy as np
-    import matplotlib.cm as cm
     import matplotlib.pyplot as plt
-    from js import document
-    from sklearn.decomposition import PCA
-    
-    my_str = "teste"
-    
-    rng = np.random.RandomState(0)
-    n_samples = 500
-    cov = [[3, 3], [3, 4]]
-    X = rng.multivariate_normal(mean=[0, 0], cov=cov, size=n_samples)
-    pca = PCA(n_components=2).fit(X)
-    
-    f = plt.figure()
-    plt.scatter(X[:, 0], X[:, 1], alpha=0.3, label="samples")
+    data = pd.read_csv("https://github.com/Adrichard14/linear_regression/tree/main/life_expectancy/population.csv")
+    from sklearn.model_selection import train_test_split
+    from sklearn.linear_model import LinearRegression
+    def calc(slope, intercept, hours):
+        return slope*hours+intercept
+
+
+    # df = pd.DataFrame(data, columns=['data', 'expectativa', 'porcetagem', ''])
+    unformatted_y = data['data']
+    y = []
+    for i in unformatted_y:
+        y.append(int(i.split('-')[0]))
+    x = data['expectativa'].values.reshape(-1, 1)
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state=23)
+
+    # x_train = np.array(x_train).reshape(-1, 1)
+    y_train = np.array(y_train).reshape(-1, 1)
+
+
+    # x_test = np.array(x_test).reshape(-1, 1)
+    y_test = np.array(y_test).reshape(-1, 1)
+
+    linear_regression = LinearRegression()
+    linear_regression.fit(x_train, y_train)
+
+    a = linear_regression.intercept_
+    b = linear_regression.coef_
+
+    # y_pred_train = a*x_train*b
+    y_pred_train = linear_regression.predict(x_train)
+    y_pred_test = linear_regression.predict(x_test)
+    # print(y_pred_train)
+
+    # plt.scatter(x, y)
+    plt.scatter(x_test, y_test)
+    plt.scatter(x_test, y_pred_test, color='red')
+
+    # score = calc(linear_regression.coef_, linear_regression.intercept_, 2050)
+    print(score)
+    # plt.ylim(-2, 2)
+    # plt.ylabel('Data', )
+    # plt.xlabel('Expectativa de vida')
+    plt.yticks((1962, 1982, 1992, 2002, 2012, 2022))
+
     for i, (comp, var) in enumerate(zip(pca.components_, pca.explained_variance_)):
         comp = comp * var  # scale component by its variance explanation power
         plt.plot(
