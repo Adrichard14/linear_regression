@@ -6,7 +6,7 @@
 	"background_color":"#5900b3",
 	"theme_color":"black",
 	"scope": ".",
-	"description":"Exemplo de uso da Regressão Linear",
+	"description":"Exemplo de uso da Regressão Linear para um orçamento de ADS",
     "icons":[
         {
             "src":"regressao.png",					
