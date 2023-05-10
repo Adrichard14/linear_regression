@@ -1,15 +1,24 @@
 async function main() {
   let pyodide = await loadPyodide();
+  await pyodide.loadPackage("micropip")
   await pyodide.loadPackage('numpy');
   await pyodide.loadPackage('matplotlib');
   await pyodide.loadPackage('scikit-learn');
-    await pyodide.loadPackage('pandas');
+  await pyodide.loadPackage('pandas');
   await pyodide.runPython(`
-
     import pandas as pd
     import numpy as np
     import matplotlib.pyplot as plt
-    data = pd.read_csv("https://github.com/Adrichard14/linear_regression/tree/main/life_expectancy/population.csv")
+    import io
+
+    import asyncio
+    from js import console, fetch
+
+    from pyodide.http import open_url
+    url = 'https://somosship.com.br/explica/adrian/population.csv'
+    url_content = open_url(url)
+    data = pd.read_csv(url_content)
+
     from sklearn.model_selection import train_test_split
     from sklearn.linear_model import LinearRegression
     def calc(slope, intercept, hours):
@@ -85,7 +94,7 @@ async function main() {
     f.canvas.show()
     `)
 
-    document.getElementById("textfield").innerText = pyodide.globals.my_str;
+  document.getElementById("textfield").innerText = pyodide.globals.my_str;
 }
 
 main();
