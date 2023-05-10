@@ -1,0 +1,124 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+  <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <py-env>
+    - pandas
+    - matplotlib
+    - pandas
+    - seaborn
+    - scikit-learn
+  </py-env>
+  <link rel="manifest" href="manifest.json">
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Regressão linear</h1>
+      <p class="lead">
+        Exemplo funcional de regressão linear para o retorno em vendas para um orçamentos de anúncios em TV, rádio e
+        jornais.
+      </p>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 p-2 shadow ml-4 mr-4 mb-4 bg-white rounded d-flex flex-column justify-content-center"
+        id="result" style="display: none">
+        <p>Orçamento</p>
+        <ul>
+          <li>
+            $<span id="tv-price"></span> para anúncios em TV
+          </li>
+          <li>
+            $<span id="radio-price"></span> para anúncios em rádios
+          </li>
+          <li>
+            $<span id="jornal-price"></span> para anúncios em jornais
+          </li>
+        </ul>
+
+        <p>Resultado para a previsão de vendas em $: <strong id="predict-result"></strong></p>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.addEventListener('load', () => {
+      registerSW();
+    });
+
+    // Registro do Service Worker
+    async function registerSW() {
+      if ('serviceWorker' in navigator) {
+        try {
+          await navigator
+            .serviceWorker
+            .register('serviceworker.js');
+        }
+        catch (e) {
+          console.log('SW registration failed');
+        }
+      }
+    }
+  </script>
+  <py-script>
+    import pandas as pd
+    import random
+    import warnings
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from pyodide.http import open_url
+    url = 'https://raw.githubusercontent.com/Adrichard14/linear_regression/main/ads/ads.csv'
+    url_content = open_url(url)
+    data = pd.read_csv(url_content)
+    from sklearn.model_selection import train_test_split
+    from sklearn.linear_model import LinearRegression
+    warnings.filterwarnings("ignore")
+    def calc(slope, intercept, hours):
+      return slope*hours+intercept
+
+    data = data.drop('id', axis=1)
+
+    x = data.drop('Sales ($)',axis= 1)
+    y = data['Sales ($)']
+
+    x_train, x_test, y_train, y_test = train_test_split(
+    x, y, test_size=0.3, random_state=101)
+
+    linear_regression = LinearRegression()
+    linear_regression.fit(x_train.values, y_train)
+
+    plt.xlabel('Budget (TV)')
+    plt.ylabel('Vendas ($)')
+
+    tv_price = random.randint(0,300)
+    radio_price = random.randint(0,100)
+    jornal_price = random.randint(0,100)
+
+    prediction = linear_regression.predict(np.array([[tv_price, radio_price, jornal_price]]))
+
+
+    def print_pred_value():
+      resultDiv = document.getElementById('result')
+      div = document.createElement('div')
+      document.body.appendChild(div)
+
+      resultDiv.style.display = 'block'
+
+      tvLabel = document.getElementById('tv-price')
+      radioLabel = document.getElementById('radio-price')
+      jornalLabel = document.getElementById('jornal-price')
+      predictLabel = document.getElementById('predict-result')
+
+      tvLabel.innerHTML = tv_price
+      radioLabel.innerHTML = radio_price
+      jornalLabel.innerHTML = jornal_price
+      predictLabel.innerHTML = prediction[0]
+
+    print_pred_value()
+  </py-script>
+</body>
+
+</html>

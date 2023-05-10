@@ -1,0 +1,17 @@
+{
+	"name":"Regressão Linear",
+	"short_name":"LReg",
+	"start_url":"index.html",
+	"display":"standalone",
+	"background_color":"#5900b3",
+	"theme_color":"black",
+	"scope": ".",
+	"description":"Exemplo de uso da Regressão Linear",
+    "icons":[
+        {
+            "src":"regressao.png",					
+            "sizes":"512x512",
+            "type":"image/png"
+        }
+    ]
+}
